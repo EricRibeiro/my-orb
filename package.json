@@ -1,0 +1,8 @@
+{
+  "name": "my-pkg-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:EricRibeiro/my-pkg-app.git",
+  "author": "Eric Ribeiro <ericribeiro@outlook.com.br>",
+  "license": "MIT"
+}
