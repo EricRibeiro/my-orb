@@ -7,6 +7,23 @@ filters: &filters
   tags:
     only: /.*/
 
+executors:
+  docker:
+    docker:
+      - image: cimg/base:current
+  
+  windows:
+    windows:
+      machine:
+        image: windows-server-2022-gui:current
+        resource_class: large
+        shell: bash.exe
+  
+  macos:
+    macos:
+      xcode: "13.4.1"
+      resource_class: medium
+
 jobs:
   # Create a job to test the commands of your orbs.
   # You may want to add additional validation steps to ensure the commands are working as expected.
@@ -37,8 +54,12 @@ jobs:
             - "."
 
   run-scripts:
-    docker:
-      - image: cimg/base:current
+    parameters:
+      executor:
+        type: executor
+
+    executor: << parameters.executor >>
+
     steps:
       - attach_workspace:
           at: ~/project
@@ -51,6 +72,9 @@ workflows:
       - pack-scripts:
           filters: *filters
       - run-scripts:
+          matrix:
+            parameters:
+              executor: [docker, macos, windows]
           filters: *filters
           requires:
             - pack-scripts
