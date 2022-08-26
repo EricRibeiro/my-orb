@@ -60,7 +60,7 @@ workflows:
           pub-type: production
           requires:
             - orb-tools/pack
-            - command-tests
+            - run-scripts
           context: orb-publishing
           filters:
             branches:
