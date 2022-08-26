@@ -7,22 +7,6 @@ filters: &filters
   tags:
     only: /.*/
 
-executors:
-  docker:
-    docker:
-      - image: cimg/base:current
-  
-  windows:
-    machine:
-      image: windows-server-2022-gui:current
-      resource_class: large
-      shell: bash.exe
-  
-  macos:
-    macos:
-      xcode: "13.4.1"
-      resource_class: medium
-
 jobs:
   # Create a job to test the commands of your orbs.
   # You may want to add additional validation steps to ensure the commands are working as expected.
@@ -47,21 +31,20 @@ jobs:
                 npx pkg "$script" --target latest-alpine-x64
               fi
             done
-      - persist_to_workspace:
-          root: ./
-          paths: 
-            - "."
+      - my-pkg-app/greet
 
-  run-scripts:
-    parameters:
-      executor:
-        type: executor
-
-    executor: << parameters.executor >>
+  run-scripts-base-image:
+    docker:
+      - image: cimg/base:current
 
     steps:
-      - attach_workspace:
-          at: ~/project
+      - checkout
+      - run: 
+          name: Package the scripts
+          command: |
+            source src/scripts/utils.sh
+            detect-os
+            for script in src/scripts/*.js; do npx pkg "$script" --target latest-linux-x64; done
       - my-pkg-app/greet
 
 workflows:
@@ -70,13 +53,8 @@ workflows:
       # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
       - pack-scripts:
           filters: *filters
-      - run-scripts:
-          matrix:
-            parameters:
-              executor: [docker, macos, windows]
+      - run-scripts-base-image:
           filters: *filters
-          requires:
-            - pack-scripts
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
