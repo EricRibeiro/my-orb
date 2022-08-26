@@ -21,13 +21,13 @@ jobs:
             source src/scripts/utils.sh
             detect-os
             for script in src/scripts/*.js; do 
-              if "$PLATFORM" == "linux"; then
+              if [ "$PLATFORM" = "linux" ]; then
                 npx pkg "$script" --target latest-linux-x64
-              elif "$PLATFORM" == "macos"; then
+              elif [ "$PLATFORM" = "macos" ]; then
                 npx pkg "$script" --target latest-macos-x64
-              elif "$PLATFORM" == "windows"; then
+              elif [ "$PLATFORM" = "windows" ]; then
                 npx pkg "$script" --target latest-win-x64
-              elif "$PLATFORM" == "alpine"; then
+              elif [ "$PLATFORM" = "alpine" ]; then
                 npx pkg "$script" --target latest-alpine-x64
               fi
             done
