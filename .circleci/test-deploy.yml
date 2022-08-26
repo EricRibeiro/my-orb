@@ -9,7 +9,7 @@ filters: &filters
 
 executors:
   docker:
-
+    - image: cimg/base:current
   
   windows:
     machine:
