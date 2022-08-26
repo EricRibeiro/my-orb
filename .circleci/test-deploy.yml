@@ -33,6 +33,7 @@ jobs:
             done
       - persist_to_workspace:
           root: .
+          path: .
 
   run-scripts:
     docker:
