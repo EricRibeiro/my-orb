@@ -7,6 +7,21 @@ filters: &filters
   tags:
     only: /.*/
 
+executors:
+  docker:
+
+  
+  windows:
+    machine:
+      image: windows-server-2022-gui:current
+      resource_class: large
+      shell: bash.exe
+  
+  macos:
+    macos:
+      xcode: "13.4.1"
+      resource_class: medium
+
 jobs:
   # Create a job to test the commands of your orbs.
   # You may want to add additional validation steps to ensure the commands are working as expected.
@@ -20,32 +35,35 @@ jobs:
           command: |
             source src/scripts/utils.sh
             detect-os
-            for script in src/scripts/*.js; do 
-              if [ "$PLATFORM" = "linux" ]; then
-                npx pkg "$script" --target latest-linux-x64
-              elif [ "$PLATFORM" = "macos" ]; then
-                npx pkg "$script" --target latest-macos-x64
-              elif [ "$PLATFORM" = "windows" ]; then
-                npx pkg "$script" --target latest-win-x64
-              elif [ "$PLATFORM" = "alpine" ]; then
-                npx pkg "$script" --target latest-alpine-x64
-              fi
-            done
-      - my-pkg-app/greet
+            for script in src/scripts/*.js; do npx pkg $script; done
+      - persist_to_workspace:
+          root: ./
+          paths: 
+            - "."
 
-  run-scripts-base-image:
+  run-scripts:
+    parameters:
+      executor:
+        type: executor
+
     docker:
       - image: cimg/base:current
 
     steps:
-      - checkout
-      - run: 
-          name: Package the scripts
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Run the scripts
           command: |
-            source src/scripts/utils.sh
-            detect-os
-            for script in src/scripts/*.js; do npx pkg "$script" --target latest-linux-x64; done
-      - my-pkg-app/greet
+            if [ "$PLATFORM" = "linux" ]; then
+              ./greet-linux
+            elif [ "$PLATFORM" = "macos" ]; then
+              ./greet-macos
+            elif [ "$PLATFORM" = "windows" ]; then
+              ./greet-win.exe
+            elif [ "$PLATFORM" = "alpine" ]; then
+              printf '%s\n' "🤮"
+            fi
 
 workflows:
   test-deploy:
@@ -53,8 +71,13 @@ workflows:
       # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
       - pack-scripts:
           filters: *filters
-      - run-scripts-base-image:
+      - run-scripts:
+          matrix:
+            parameters:
+              executor: [docker, macos, windows]
           filters: *filters
+          requires:
+            - pack-scripts
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
