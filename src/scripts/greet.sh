@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./greet-linux
+./greet
