@@ -10,7 +10,7 @@ filters: &filters
 jobs:
   # Create a job to test the commands of your orbs.
   # You may want to add additional validation steps to ensure the commands are working as expected.
-  command-tests:
+  pack-scripts:
     docker:
       - image: cimg/node:current
     steps:
@@ -31,17 +31,27 @@ jobs:
                 npx pkg "$script" --target latest-alpine-x64
               fi
             done
-      - run: 
-          name: Run the scripts
-          command: |
-            script=$(ls greet*)
+      - persist_to_workspace:
+          root: .
+
+  run-scripts:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - attach_workspace:
+          at: .
       - my-pkg-app/greet
+
 workflows:
   test-deploy:
     jobs:
       # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
-      - command-tests:
+      - pack-scripts:
           filters: *filters
+      - run-scripts:
+          filters: *filters
+          requires:
+            - pack-scripts
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
