@@ -32,11 +32,12 @@ jobs:
     steps:
       - checkout
       - run: 
-          name: Package the scripts
+          name: Pack the scripts
           command: |
             source src/scripts/utils.sh
             detect-os
             for script in src/scripts/*.js; do npx pkg $script; done
+            ls -lhaG --color=always | sed -re 's/^[^ ]* //'
       - persist_to_workspace:
           root: ./
           paths: 
