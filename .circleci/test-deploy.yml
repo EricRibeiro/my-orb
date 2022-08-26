@@ -8,18 +8,18 @@ filters: &filters
     only: /.*/
 
 executors:
-  docker:
+  docker-base:
     docker:
       - image: cimg/base:current
   
-  windows:
+  windows-2022:
     windows:
       machine:
         image: windows-server-2022-gui:current
         resource_class: large
         shell: bash.exe
   
-  macos:
+  macos-13:
     macos:
       xcode: "13.4.1"
       resource_class: medium
@@ -74,7 +74,7 @@ workflows:
       - run-scripts:
           matrix:
             parameters:
-              executor: [docker, macos, windows]
+              executor: [docker-base, macos-13, windows-2022]
           filters: *filters
           requires:
             - pack-scripts
