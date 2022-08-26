@@ -32,15 +32,16 @@ jobs:
               fi
             done
       - persist_to_workspace:
-          root: .
-          path: .
+          root: ./
+          paths: 
+            - "."
 
   run-scripts:
     docker:
       - image: cimg/base:current
     steps:
       - attach_workspace:
-          at: .
+          at: ~/project
       - my-pkg-app/greet
 
 workflows:
