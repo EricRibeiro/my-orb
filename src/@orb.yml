@@ -1,13 +1,14 @@
 version: 2.1
 
 description: >
-  Sample orb description
+  A simple project to test if I can write an orb in Node and run it on executors without node installed.
+  I'll be using Vercel's pkg CLI to compile the Node code into a binary that can be run on any machine.
 # What will your orb allow users to accomplish?
 # Descriptions should be short, simple, and informative.
 
 # This information will be displayed in the orb registry and is not mandatory.
 display:
-  home_url: "https://www.example.com/docs"
+  home_url: "https://github.com/EricRibeiro/my-pkg-app"
   source_url: "https://github.com/EricRibeiro/my-pkg-app"
 
 # If your orb requires other orbs, you can import them like this. Otherwise remove the "orbs" stanza.
